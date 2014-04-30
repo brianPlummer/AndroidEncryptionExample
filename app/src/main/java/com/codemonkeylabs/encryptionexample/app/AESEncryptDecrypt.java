@@ -13,8 +13,10 @@ import javax.crypto.spec.SecretKeySpec;
 public class AESEncryptDecrypt {
 
 
+    //16 byte key....other sizes allowed.....getBytes defaults to utf-8
     public static final String NOT_SECRET_ENCRYPTION_KEY = "1234567812345678";
-    private static final String IVS = "12345678";
+    //Must be 16 bytes long....getBytes defaults to utf-8
+    private static final String IVS = "1234567812345678";
 
 
     public String encrypt(String inData, byte[] key){
@@ -36,16 +38,12 @@ public class AESEncryptDecrypt {
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
-            byte[] finalIvs = new byte[16];
-            int len = ivs.length > 16 ? 16 : ivs.length;
-            System.arraycopy(ivs, 0, finalIvs, 0, len);
-            IvParameterSpec ivps = new IvParameterSpec(finalIvs);
+            IvParameterSpec ivps = new IvParameterSpec(ivs);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivps);
             return cipher.doFinal(data);
         } catch (Exception e) {
             Log.e("##########",e.getMessage(),e);
         }
-
         return null;
     }
 
@@ -53,16 +51,12 @@ public class AESEncryptDecrypt {
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
-            byte[] finalIvs = new byte[16];
-            int len = ivs.length > 16 ? 16 : ivs.length;
-            System.arraycopy(ivs, 0, finalIvs, 0, len);
-            IvParameterSpec ivps = new IvParameterSpec(finalIvs);
+            IvParameterSpec ivps = new IvParameterSpec(ivs);
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivps);
             return cipher.doFinal(data);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("##########",e.getMessage(),e);
         }
-
         return null;
     }
 
