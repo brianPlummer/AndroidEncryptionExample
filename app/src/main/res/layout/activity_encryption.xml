@@ -1,0 +1,90 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.codemonkeylabs.encryptionexample.app.EncryptionActivity">
+
+
+    <EditText
+        android:id="@+id/originalText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="15dip"
+        android:layout_marginTop="15dip"
+        android:minLines="3"
+        android:gravity="top|left"
+        android:padding="5dip"
+        android:text="@string/default_hint"/>
+
+
+    <Button android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Encrypt"
+        android:padding="10dip"
+        android:id="@+id/encryptButton"
+        android:layout_below="@id/originalText"
+        android:layout_marginTop="15dip"
+        android:layout_alignParentLeft="true"/>
+
+
+
+
+
+
+    <EditText
+        android:id="@+id/encryptedText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/encryptButton"
+        android:layout_below="@id/originalText"
+        android:layout_marginLeft="15dip"
+        android:layout_marginTop="15dip"
+        android:minLines="5"
+        android:gravity="top|left"
+        android:padding="5dip"
+        android:editable="false"
+        android:ellipsize="end"
+        />
+
+
+    <Button android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Decrypt"
+        android:padding="10dip"
+        android:id="@+id/decryptButton"
+        android:layout_below="@id/encryptedText"
+        android:layout_marginTop="15dip"
+        android:layout_alignParentLeft="true"/>
+
+
+    <EditText
+        android:id="@+id/decryptedText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/encryptButton"
+        android:layout_below="@id/encryptedText"
+        android:layout_marginLeft="15dip"
+        android:layout_marginTop="15dip"
+        android:minLines="3"
+        android:gravity="top|left"
+        android:padding="5dip"
+        android:editable="false"/>
+
+    <Button
+        android:id="@+id/clearButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/decryptedText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dip"
+        android:text="Clear"
+        android:padding="10dip"/>
+
+
+</RelativeLayout>
