@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-
 public class EncryptionActivity extends Activity {
 
     private Button encryptButton = null, decryptButton = null, clearButton = null;
@@ -38,9 +37,6 @@ public class EncryptionActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
@@ -48,13 +44,11 @@ public class EncryptionActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-
     private void wireUI(){
 
         this.originalText = (EditText)findViewById(R.id.originalText);
         this.encryptedText = (EditText)findViewById(R.id.encryptedText);
         this.decryptedText = (EditText)findViewById(R.id.decryptedText);
-
 
         this.encryptButton = (Button)findViewById(R.id.encryptButton);
         this.encryptButton.setOnClickListener(new View.OnClickListener() {
@@ -79,7 +73,6 @@ public class EncryptionActivity extends Activity {
                 clearButton();
             }
         });
-
     }
 
     private void decryptButton(){
@@ -103,6 +96,7 @@ public class EncryptionActivity extends Activity {
             this.encryptedText.setText(this.encryptDecrypt.encrypt(original,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes()));
 
         this.encryptedAESKey = this.rsaEncryptDecrypt.encrypt(AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes());
+
     }
 
 
