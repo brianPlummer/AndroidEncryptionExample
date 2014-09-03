@@ -1,9 +1,7 @@
 bin
 gen
-externalRootPath
 local.properties
-codesign.properties
-production-app-releases.keystore
+
 #.settings
 proguard
 tmp/
