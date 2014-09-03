@@ -1,4 +1,16 @@
-.gradle
-/local.properties
-/.idea/workspace.xml
-.DS_Store
+bin
+gen
+externalRootPath
+local.properties
+codesign.properties
+production-app-releases.keystore
+#.settings
+proguard
+tmp/
+
+# Gradle
+.gradle/
+build/
+
+.idea
+*.iml
