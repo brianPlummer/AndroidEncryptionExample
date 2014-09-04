@@ -10,5 +10,7 @@ tmp/
 .gradle/
 build/
 
-.idea
+.idea/
 *.iml
+
+app/*.iml
