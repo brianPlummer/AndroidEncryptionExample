@@ -19,7 +19,8 @@ public class EncryptionActivity extends Activity {
     private byte[] encryptedAESKey = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_encryption);
         wireUI();
@@ -27,25 +28,26 @@ public class EncryptionActivity extends Activity {
         this.rsaEncryptDecrypt = new RSAEncryptDecrypt();
     }
 
-
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         getMenuInflater().inflate(R.menu.encryption, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_settings)
+        {
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void wireUI(){
-
+    private void wireUI()
+    {
         this.originalText = (EditText)findViewById(R.id.originalText);
         this.encryptedText = (EditText)findViewById(R.id.encryptedText);
         this.decryptedText = (EditText)findViewById(R.id.decryptedText);
@@ -80,24 +82,28 @@ public class EncryptionActivity extends Activity {
         byte[] decryptedAESKey = this.rsaEncryptDecrypt.decrypt(this.encryptedAESKey);
 
         if(encText!=null && encText.trim().length()>0)
-            this.decryptedText.setText(this.encryptDecrypt.decrypt(encText,decryptedAESKey));
+        {
+            this.decryptedText.setText(this.encryptDecrypt.decrypt(encText, decryptedAESKey));
+        }
     }
 
-    private void clearButton(){
+    private void clearButton()
+    {
         this.originalText.setText(getString(R.string.default_hint));
         this.encryptedText.setText(" ");
         this.decryptedText.setText(" ");
         this.encryptedAESKey = null;
     }
 
-    private void encryptButton(){
+    private void encryptButton()
+    {
         String original = this.originalText.getText().toString();
         if(original!=null && original.trim().length()>0)
-            this.encryptedText.setText(this.encryptDecrypt.encrypt(original,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes()));
+        {
+            this.encryptedText.setText(this.encryptDecrypt.encrypt(original, AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes()));
+        }
 
         this.encryptedAESKey = this.rsaEncryptDecrypt.encrypt(AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes());
-
     }
-
 
 }

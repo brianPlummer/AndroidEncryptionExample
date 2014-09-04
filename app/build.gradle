@@ -1,4 +1,17 @@
-apply plugin: 'android'
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath 'org.robolectric:robolectric-gradle-plugin:0.11.+'
+    }
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'robolectric'
 
 android {
     compileSdkVersion 19
@@ -10,16 +23,34 @@ android {
         versionCode 1
         versionName "1.0"
     }
-    buildTypes {
-        release {
-            runProguard false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+
+    sourceSets {
+        main {
+            java.srcDir file('src/main/java')
+            manifest.srcFile file('src/main/AndroidManifest.xml')
+            res.srcDir file('src/main/resources')
+        }
+        androidTest {
+            setRoot('src/test')
         }
     }
 }
 
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:19.+'
-    compile 'commons-io:commons-io:20030203.000550@jar'
+robolectric {
+    // configure the set of classes for JUnit tests
+    include '**/*Test.class'
+
+    // configure max heap size of the test JVM
+    maxHeapSize = "2048m"
 }
+
+dependencies {
+    compile 'com.android.support:appcompat-v7:19.+'
+    compile 'org.apache.commons:commons-io:1.3.2'
+    compile 'org.ow2.util.base64:base64:2.0.0'
+
+    androidTestCompile 'org.apache.commons:commons-io:1.3.2'
+    androidTestCompile 'junit:junit:4.11'
+}
+
+
