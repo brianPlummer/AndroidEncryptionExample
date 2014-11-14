@@ -16,6 +16,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
+ * AES Helper Encryption Class
  * Created by brianplummer on 4/29/14.
  */
 public class AESEncryptDecrypt {
@@ -23,22 +24,24 @@ public class AESEncryptDecrypt {
     //16 byte key....other sizes allowed.....getBytes defaults to utf-8
     public static final String NOT_SECRET_ENCRYPTION_KEY = "1234567812345678";
     //Must be 16 bytes long....getBytes defaults to utf-8
-    private static final String IVS = "1234567812345678";
+    public static final String IVS = "1234567812345678";
 
     public static final String AES_CIPHER = "AES/CTR/NoPadding";
     public static final String AES = "AES";
 
-    public String encrypt(String inData, byte[] key)
+    public String encrypt(String inData, byte[] key, byte[] ivs)
     {
-        byte[] encryptedData = aesEncrypt(inData.getBytes(), key,
-                IVS.getBytes());
+        byte[] encryptedData = aesEncrypt(inData.getBytes(),
+                key,
+                ivs);
         return new String(Base64.encode(encryptedData));
     }
 
-    public String decrypt(String inData, byte[] key)
+    public String decrypt(String inData, byte[] key, byte[] ivs)
     {
         byte[] decryptData = aesDecrypt(Base64.decode(inData.toCharArray()),
-                key,IVS.getBytes());
+                key,
+                ivs);
         return new String(decryptData);
     }
 

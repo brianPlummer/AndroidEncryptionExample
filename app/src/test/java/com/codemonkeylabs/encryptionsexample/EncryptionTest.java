@@ -12,6 +12,7 @@ import org.junit.runners.JUnit4;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Created by brianplummer on 9/2/14.
@@ -38,8 +39,8 @@ public class EncryptionTest
     public void testAESEncryption()
     {
         AESEncryptDecrypt aesEncryptDecrypt = new AESEncryptDecrypt();
-        String encryptedString = aesEncryptDecrypt.encrypt(testText,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes());
-        String unencryptedString = aesEncryptDecrypt.decrypt(encryptedString,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes());
+        String encryptedString = aesEncryptDecrypt.encrypt(testText,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(), AESEncryptDecrypt.IVS.getBytes());
+        String unencryptedString = aesEncryptDecrypt.decrypt(encryptedString,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(), AESEncryptDecrypt.IVS.getBytes());
         assertTrue(unencryptedString.startsWith("All this while Tashtego, Daggoo, and Queequeg"));
     }
 
@@ -48,10 +49,25 @@ public class EncryptionTest
     {
         AESEncryptDecrypt aesEncryptDecrypt = new AESEncryptDecrypt();
         RSAEncryptDecrypt rsaEncryptDecrypt = new RSAEncryptDecrypt();
-        String encryptedString = aesEncryptDecrypt.encrypt(testText,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes());
-        byte[] encryptedAESKey = rsaEncryptDecrypt.encrypt(AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes());
+        String encryptedString = aesEncryptDecrypt.encrypt(testText,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(), AESEncryptDecrypt.IVS.getBytes());
+
+        byte[] combined = concat(AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(), AESEncryptDecrypt.IVS.getBytes());
+
+        byte[] encryptedAESKey = rsaEncryptDecrypt.encrypt(combined);
+
         byte[] unencryptedAESKey = rsaEncryptDecrypt.decrypt(encryptedAESKey);
-        String unencryptedString = aesEncryptDecrypt.decrypt(encryptedString,unencryptedAESKey);
+
+        byte[] aesKey = Arrays.copyOfRange(unencryptedAESKey, 0, 16);
+        byte[] ivs = Arrays.copyOfRange(unencryptedAESKey, 16, 32);
+
+        String unencryptedString = aesEncryptDecrypt.decrypt(encryptedString, aesKey, ivs);
         assertTrue(unencryptedString.startsWith("All this while Tashtego, Daggoo, and Queequeg"));
+    }
+
+    public byte[] concat(byte[] first, byte[] second){
+        byte[] combined = new byte[first.length + second.length];
+        System.arraycopy(first, 0, combined, 0, first.length);
+        System.arraycopy(second, 0, combined, first.length, second.length);
+        return combined;
     }
 }

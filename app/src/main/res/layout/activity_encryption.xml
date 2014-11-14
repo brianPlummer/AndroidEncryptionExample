@@ -10,7 +10,7 @@
 
 
     <EditText
-        android:id="@+id/originalText"
+        android:id="@+id/inputtedUnencryptedText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
@@ -28,12 +28,9 @@
         android:text="Encrypt"
         android:padding="10dip"
         android:id="@+id/encryptButton"
-        android:layout_below="@id/originalText"
+        android:layout_below="@id/inputtedUnencryptedText"
         android:layout_marginTop="15dip"
         android:layout_alignParentLeft="true"/>
-
-
-
 
 
 
@@ -42,7 +39,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/encryptButton"
-        android:layout_below="@id/originalText"
+        android:layout_below="@id/inputtedUnencryptedText"
         android:layout_marginLeft="15dip"
         android:layout_marginTop="15dip"
         android:minLines="5"

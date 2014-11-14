@@ -11,6 +11,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 /**
+ * RSA Helper Encryption Class
  * Created by brianplummer on 4/29/14.
  */
 public class RSAEncryptDecrypt {
