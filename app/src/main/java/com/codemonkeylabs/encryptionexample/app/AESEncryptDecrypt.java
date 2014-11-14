@@ -16,6 +16,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
+ * AES Helper Encryption Class
  * Created by brianplummer on 4/29/14.
  */
 public class AESEncryptDecrypt {

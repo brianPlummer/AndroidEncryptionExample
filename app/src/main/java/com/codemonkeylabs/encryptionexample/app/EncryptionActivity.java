@@ -2,6 +2,7 @@ package com.codemonkeylabs.encryptionexample.app;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -114,7 +115,7 @@ public class EncryptionActivity extends Activity {
         String inputtedUnencryptedText = this.inputtedUnencryptedText.getText().toString();
 
         //sanity check on input
-        if(inputtedUnencryptedText!=null && inputtedUnencryptedText.trim().length()>0)
+        if(TextUtils.isEmpty(inputtedUnencryptedText))
         {
             return;
         }
