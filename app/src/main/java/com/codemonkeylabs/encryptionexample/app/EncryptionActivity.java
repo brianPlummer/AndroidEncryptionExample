@@ -8,14 +8,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.Arrays;
+
 public class EncryptionActivity extends Activity {
 
     private Button encryptButton = null, decryptButton = null, clearButton = null;
-    private EditText decryptedText = null, encryptedText = null, originalText = null ;
+    private EditText decryptedText = null, encryptedText = null, inputtedUnencryptedText = null ;
 
-    private AESEncryptDecrypt encryptDecrypt;
+    //helper encryption classes
+    private AESEncryptDecrypt aesEncryptDecrypt;
     private RSAEncryptDecrypt rsaEncryptDecrypt;
 
+    //encrypted aes key and ivs combined
     private byte[] encryptedAESKey = null;
 
     @Override
@@ -24,7 +28,7 @@ public class EncryptionActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_encryption);
         wireUI();
-        this.encryptDecrypt = new AESEncryptDecrypt();
+        this.aesEncryptDecrypt = new AESEncryptDecrypt();
         this.rsaEncryptDecrypt = new RSAEncryptDecrypt();
     }
 
@@ -46,9 +50,12 @@ public class EncryptionActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    /*
+     *  wire the ui
+     */
     private void wireUI()
     {
-        this.originalText = (EditText)findViewById(R.id.originalText);
+        this.inputtedUnencryptedText = (EditText)findViewById(R.id.inputtedUnencryptedText);
         this.encryptedText = (EditText)findViewById(R.id.encryptedText);
         this.decryptedText = (EditText)findViewById(R.id.decryptedText);
 
@@ -78,18 +85,25 @@ public class EncryptionActivity extends Activity {
     }
 
     private void decryptButton(){
-        String encText = this.encryptedText.getText().toString();
-        byte[] decryptedAESKey = this.rsaEncryptDecrypt.decrypt(this.encryptedAESKey);
 
+        String encText = this.encryptedText.getText().toString();
+
+        //sanity test on input from ui
         if(encText!=null && encText.trim().length()>0)
         {
-            this.decryptedText.setText(this.encryptDecrypt.decrypt(encText, decryptedAESKey));
+            //decrypt the stored aes and ivs key
+            byte[] decryptedAESKeyIVS = this.rsaEncryptDecrypt.decrypt(this.encryptedAESKey);
+
+            byte[] aesKey = Arrays.copyOfRange(decryptedAESKeyIVS, 0, 16);
+            byte[] ivs = Arrays.copyOfRange(decryptedAESKeyIVS, 16, 32);
+
+            this.decryptedText.setText(this.aesEncryptDecrypt.decrypt(encText, aesKey, ivs));
         }
     }
 
     private void clearButton()
     {
-        this.originalText.setText(getString(R.string.default_hint));
+        this.inputtedUnencryptedText.setText(getString(R.string.default_hint));
         this.encryptedText.setText(" ");
         this.decryptedText.setText(" ");
         this.encryptedAESKey = null;
@@ -97,13 +111,36 @@ public class EncryptionActivity extends Activity {
 
     private void encryptButton()
     {
-        String original = this.originalText.getText().toString();
-        if(original!=null && original.trim().length()>0)
+        String inputtedUnencryptedText = this.inputtedUnencryptedText.getText().toString();
+
+        //sanity check on input
+        if(inputtedUnencryptedText!=null && inputtedUnencryptedText.trim().length()>0)
         {
-            this.encryptedText.setText(this.encryptDecrypt.encrypt(original, AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes()));
+            return;
         }
 
-        this.encryptedAESKey = this.rsaEncryptDecrypt.encrypt(AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes());
+        //encrypt the inputted text using AES
+        String encryptedText = aesEncryptDecrypt.encrypt(inputtedUnencryptedText,
+                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
+                AESEncryptDecrypt.IVS.getBytes());
+
+        //set ui textview to encrypted base64 encoded value
+        this.encryptedText.setText(encryptedText);
+
+
+        //we combine the aes key and the ivs so we can encrypt it in one go
+        byte[] combinedKey = concat(AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
+                AESEncryptDecrypt.IVS.getBytes());
+
+        //we encrypt the combined key and store it for decryption later
+        encryptedAESKey = this.rsaEncryptDecrypt.encrypt(combinedKey);
+    }
+
+    public byte[] concat(byte[] first, byte[] second){
+        byte[] combined = new byte[first.length + second.length];
+        System.arraycopy(first, 0, combined, 0, first.length);
+        System.arraycopy(second, 0, combined, first.length, second.length);
+        return combined;
     }
 
 }
