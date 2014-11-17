@@ -137,6 +137,7 @@ public class EncryptionActivity extends Activity {
         encryptedAESKey = this.rsaEncryptDecrypt.encrypt(combinedKey);
     }
 
+    //helper function that concats two byte arrays
     public byte[] concat(byte[] first, byte[] second){
         byte[] combined = new byte[first.length + second.length];
         System.arraycopy(first, 0, combined, 0, first.length);
