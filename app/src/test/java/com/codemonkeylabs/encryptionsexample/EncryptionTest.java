@@ -11,6 +11,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -26,7 +28,9 @@ public class EncryptionTest
     @Before
     public void setUp() throws IOException
     {
-        testText = IOUtils.toString(getClass().getResourceAsStream("/moby_dick.txt"));
+        File mobyDickFile = new File("src/test/resources/moby_dick.txt");
+        FileInputStream fis = new FileInputStream(mobyDickFile);
+        testText = IOUtils.toString(fis);
     }
 
     @After
