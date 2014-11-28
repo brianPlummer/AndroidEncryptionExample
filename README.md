@@ -1,4 +1,4 @@
-AndroidEncryptionExample
+Android Encryption Example
 ========================
 
 This is a basic example of using RSA and AES encryption in Android.  This example encrypts an inputted string using 
