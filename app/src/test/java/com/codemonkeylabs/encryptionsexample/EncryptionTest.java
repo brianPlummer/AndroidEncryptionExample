@@ -36,18 +36,27 @@ public class EncryptionTest
     }
 
     @Test
-    public void testAESEncryption()
+    public void testAESEncryptionCTR()
     {
         AESEncryptDecrypt aesEncryptDecrypt = new AESEncryptDecrypt();
-        String encryptedString = aesEncryptDecrypt.encrypt(testText,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(), AESEncryptDecrypt.IVS.getBytes());
-        String unencryptedString = aesEncryptDecrypt.decrypt(encryptedString,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(), AESEncryptDecrypt.IVS.getBytes());
+        String encryptedString = aesEncryptDecrypt.encryptCTR(testText, AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(), AESEncryptDecrypt.IVS.getBytes());
+        String unencryptedString = aesEncryptDecrypt.decryptCTR(encryptedString, AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(), AESEncryptDecrypt.IVS.getBytes());
+        assertTrue(unencryptedString.startsWith("All this while Tashtego, Daggoo, and Queequeg"));
+    }
+
+    @Test
+    public void testAESEncryptionECB()
+    {
+        AESEncryptDecrypt aesEncryptDecrypt = new AESEncryptDecrypt();
+        String encryptedString = aesEncryptDecrypt.encryptECB(testText, AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes());
+        String unencryptedString = aesEncryptDecrypt.decryptECB(encryptedString, AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes());
         assertTrue(unencryptedString.startsWith("All this while Tashtego, Daggoo, and Queequeg"));
     }
 
     @Test
     public void testRSAandAESEncryption()
     {
-        AESEncryptDecrypt aesEncryptDecrypt = new AESEncryptDecrypt();
+       /* AESEncryptDecrypt aesEncryptDecrypt = new AESEncryptDecrypt();
         RSAEncryptDecrypt rsaEncryptDecrypt = new RSAEncryptDecrypt();
         String encryptedString = aesEncryptDecrypt.encrypt(testText,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(), AESEncryptDecrypt.IVS.getBytes());
 
@@ -61,7 +70,7 @@ public class EncryptionTest
         byte[] ivs = Arrays.copyOfRange(unencryptedAESKey, 16, 32);
 
         String unencryptedString = aesEncryptDecrypt.decrypt(encryptedString, aesKey, ivs);
-        assertTrue(unencryptedString.startsWith("All this while Tashtego, Daggoo, and Queequeg"));
+        assertTrue(unencryptedString.startsWith("All this while Tashtego, Daggoo, and Queequeg"));*/
     }
 
     //helper function that concats two byte arrays
