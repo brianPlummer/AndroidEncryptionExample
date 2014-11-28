@@ -36,11 +36,19 @@ public class EncryptionTest
     }
 
     @Test
-    public void testAESEncryption()
+    public void testAESEncryptionCTR()
     {
         AESEncryptDecrypt aesEncryptDecrypt = new AESEncryptDecrypt();
-        String encryptedString = aesEncryptDecrypt.encrypt(testText,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(), AESEncryptDecrypt.IVS.getBytes());
-        String unencryptedString = aesEncryptDecrypt.decrypt(encryptedString,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(), AESEncryptDecrypt.IVS.getBytes());
+        String encryptedString = aesEncryptDecrypt.encrypt(testText,
+                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
+                AESEncryptDecrypt.IVS.getBytes(),
+                AESEncryptDecrypt.AESCipherType.AES_CIPHER_CTR_NOPADDING);
+
+        String unencryptedString = aesEncryptDecrypt.decrypt(encryptedString,
+                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
+                AESEncryptDecrypt.IVS.getBytes(),
+                AESEncryptDecrypt.AESCipherType.AES_CIPHER_CTR_NOPADDING
+        );
         assertTrue(unencryptedString.startsWith("All this while Tashtego, Daggoo, and Queequeg"));
     }
 
@@ -48,8 +56,15 @@ public class EncryptionTest
     public void testAESEncryptionECB()
     {
         AESEncryptDecrypt aesEncryptDecrypt = new AESEncryptDecrypt();
-        String encryptedString = aesEncryptDecrypt.encryptECB(testText,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes());
-        String unencryptedString = aesEncryptDecrypt.decryptECB(encryptedString,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes());
+        String encryptedString = aesEncryptDecrypt.encrypt(testText,
+                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
+                null,
+                AESEncryptDecrypt.AESCipherType.AES_CIPHER_ECB_PKCS5PADDING);
+
+        String unencryptedString = aesEncryptDecrypt.decrypt(encryptedString,
+                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
+                null,
+                AESEncryptDecrypt.AESCipherType.AES_CIPHER_ECB_PKCS5PADDING);
         assertTrue(unencryptedString.startsWith("All this while Tashtego, Daggoo, and Queequeg"));
     }
 
@@ -58,7 +73,10 @@ public class EncryptionTest
     {
         AESEncryptDecrypt aesEncryptDecrypt = new AESEncryptDecrypt();
         RSAEncryptDecrypt rsaEncryptDecrypt = new RSAEncryptDecrypt();
-        String encryptedString = aesEncryptDecrypt.encrypt(testText,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(), AESEncryptDecrypt.IVS.getBytes());
+        String encryptedString = aesEncryptDecrypt.encrypt(testText,
+                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
+                AESEncryptDecrypt.IVS.getBytes(),
+                AESEncryptDecrypt.AESCipherType.AES_CIPHER_CTR_NOPADDING);
 
         byte[] combined = concat(AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(), AESEncryptDecrypt.IVS.getBytes());
 
@@ -69,7 +87,10 @@ public class EncryptionTest
         byte[] aesKey = Arrays.copyOfRange(unencryptedAESKey, 0, 16);
         byte[] ivs = Arrays.copyOfRange(unencryptedAESKey, 16, 32);
 
-        String unencryptedString = aesEncryptDecrypt.decrypt(encryptedString, aesKey, ivs);
+        String unencryptedString = aesEncryptDecrypt.decrypt(encryptedString,
+                aesKey,
+                ivs,
+                AESEncryptDecrypt.AESCipherType.AES_CIPHER_CTR_NOPADDING);
         assertTrue(unencryptedString.startsWith("All this while Tashtego, Daggoo, and Queequeg"));
     }
 

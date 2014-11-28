@@ -21,6 +21,8 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class AESEncryptDecrypt {
 
+    public static final int BYTE_BUFFER_SIZE = 1024 * 100;//100k
+
     //16 byte key....other sizes allowed.....getBytes defaults to utf-8
     public static final String NOT_SECRET_ENCRYPTION_KEY = "1234567812345678";
     //Must be 16 bytes long....getBytes defaults to utf-8
@@ -43,43 +45,30 @@ public class AESEncryptDecrypt {
         }
     }
 
-    public String encrypt(String inData, byte[] key, byte[] ivs)
+    public String encrypt(String inData,
+                          byte[] key,
+                          byte[] ivs,
+                          AESCipherType aesCipherType)
     {
         byte[] encryptedData = aesEncrypt(inData.getBytes(),
                 key,
                 ivs,
-                AESCipherType.AES_CIPHER_CTR_NOPADDING);
+                aesCipherType);
         return new String(Base64.encode(encryptedData));
     }
 
-    public String decrypt(String inData, byte[] key, byte[] ivs)
+    public String decrypt(String inData,
+                          byte[] key,
+                          byte[] ivs,
+                          AESCipherType aesCipherType)
     {
         byte[] decryptData = aesDecrypt(Base64.decode(inData.toCharArray()),
                 key,
                 ivs,
-                AESCipherType.AES_CIPHER_CTR_NOPADDING);
+                aesCipherType);
         return new String(decryptData);
     }
 
-    public String encryptECB(String inData, byte[] key)
-    {
-        byte[] encryptedData = aesEncrypt(inData.getBytes(),
-                key,
-                null,
-                AESCipherType.AES_CIPHER_ECB_PKCS5PADDING);
-        return new String(Base64.encode(encryptedData));
-    }
-
-    public String decryptECB(String inData, byte[] key)
-    {
-        byte[] decryptData = aesDecrypt(Base64.decode(inData.toCharArray()),
-                key,
-                null,
-                AESCipherType.AES_CIPHER_ECB_PKCS5PADDING);
-        return new String(decryptData);
-    }
-
-        public static final int BYTE_BUFFER_SIZE = 1024 * 100;//100k
 
     public static byte[] aesEncrypt(byte[] data, byte[] key, byte[] ivs, AESCipherType aesCipherType)
     {

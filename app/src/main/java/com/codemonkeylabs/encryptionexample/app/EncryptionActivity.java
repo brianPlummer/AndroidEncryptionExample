@@ -98,7 +98,10 @@ public class EncryptionActivity extends Activity {
             byte[] aesKey = Arrays.copyOfRange(decryptedAESKeyIVS, 0, 16);
             byte[] ivs = Arrays.copyOfRange(decryptedAESKeyIVS, 16, 32);
 
-            this.decryptedText.setText(this.aesEncryptDecrypt.decrypt(encText, aesKey, ivs));
+            this.decryptedText.setText(this.aesEncryptDecrypt.decrypt(encText,
+                    aesKey,
+                    ivs,
+                    AESEncryptDecrypt.AESCipherType.AES_CIPHER_CTR_NOPADDING));
         }
     }
 
@@ -123,7 +126,8 @@ public class EncryptionActivity extends Activity {
         //encrypt the inputted text using AES
         String encryptedText = aesEncryptDecrypt.encrypt(inputtedUnencryptedText,
                 AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
-                AESEncryptDecrypt.IVS.getBytes());
+                AESEncryptDecrypt.IVS.getBytes(),
+                AESEncryptDecrypt.AESCipherType.AES_CIPHER_CTR_NOPADDING);
 
         //set ui textview to encrypted base64 encoded value
         this.encryptedText.setText(encryptedText);
