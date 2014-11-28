@@ -45,6 +45,15 @@ public class EncryptionTest
     }
 
     @Test
+    public void testAESEncryptionECB()
+    {
+        AESEncryptDecrypt aesEncryptDecrypt = new AESEncryptDecrypt();
+        String encryptedString = aesEncryptDecrypt.encryptECB(testText,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes());
+        String unencryptedString = aesEncryptDecrypt.decryptECB(encryptedString,AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes());
+        assertTrue(unencryptedString.startsWith("All this while Tashtego, Daggoo, and Queequeg"));
+    }
+
+    @Test
     public void testRSAandAESEncryption()
     {
         AESEncryptDecrypt aesEncryptDecrypt = new AESEncryptDecrypt();

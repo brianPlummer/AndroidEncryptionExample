@@ -26,14 +26,29 @@ public class AESEncryptDecrypt {
     //Must be 16 bytes long....getBytes defaults to utf-8
     public static final String IVS = "1234567812345678";
 
-    public static final String AES_CIPHER = "AES/CTR/NoPadding";
     public static final String AES = "AES";
+
+    public enum AESCipherType {
+        AES_CIPHER_CTR_NOPADDING("AES/CTR/NOPADDING"),
+        AES_CIPHER_ECB_PKCS5PADDING("AES/ECB/PKCS5PADDING");
+
+        private final String value;
+
+        AESCipherType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
 
     public String encrypt(String inData, byte[] key, byte[] ivs)
     {
         byte[] encryptedData = aesEncrypt(inData.getBytes(),
                 key,
-                ivs);
+                ivs,
+                AESCipherType.AES_CIPHER_CTR_NOPADDING);
         return new String(Base64.encode(encryptedData));
     }
 
@@ -41,22 +56,47 @@ public class AESEncryptDecrypt {
     {
         byte[] decryptData = aesDecrypt(Base64.decode(inData.toCharArray()),
                 key,
-                ivs);
+                ivs,
+                AESCipherType.AES_CIPHER_CTR_NOPADDING);
         return new String(decryptData);
     }
 
-    public static final int BYTE_BUFFER_SIZE = 1024 * 100;//100k
+    public String encryptECB(String inData, byte[] key)
+    {
+        byte[] encryptedData = aesEncrypt(inData.getBytes(),
+                key,
+                null,
+                AESCipherType.AES_CIPHER_ECB_PKCS5PADDING);
+        return new String(Base64.encode(encryptedData));
+    }
 
-    public static byte[] aesEncrypt(byte[] data, byte[] key, byte[] ivs)
+    public String decryptECB(String inData, byte[] key)
+    {
+        byte[] decryptData = aesDecrypt(Base64.decode(inData.toCharArray()),
+                key,
+                null,
+                AESCipherType.AES_CIPHER_ECB_PKCS5PADDING);
+        return new String(decryptData);
+    }
+
+        public static final int BYTE_BUFFER_SIZE = 1024 * 100;//100k
+
+    public static byte[] aesEncrypt(byte[] data, byte[] key, byte[] ivs, AESCipherType aesCipherType)
     {
         CipherOutputStream cos = null;
         ByteArrayOutputStream bos = null;
         try
         {
-            Cipher cipher = Cipher.getInstance(AES_CIPHER);
+            Cipher cipher = Cipher.getInstance(aesCipherType.getValue());
+
             SecretKeySpec secretKeySpec = new SecretKeySpec(key, AES);
-            IvParameterSpec ivps = new IvParameterSpec(ivs);
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivps);
+            if( ivs == null)
+            {
+                cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+            } else {
+                IvParameterSpec ivps = new IvParameterSpec(ivs);
+                cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivps);
+            }
 
             bos = new ByteArrayOutputStream(BYTE_BUFFER_SIZE);
             cos = new CipherOutputStream(bos,cipher);
@@ -81,16 +121,21 @@ public class AESEncryptDecrypt {
         }
     }
 
-    public static byte[] aesDecrypt(byte[] data, byte[] key, byte[] ivs)
+    public static byte[] aesDecrypt(byte[] data, byte[] key, byte[] ivs, AESCipherType aesCipherType)
     {
         byte[] retData = null;
         CipherInputStream cis = null;
         try
         {
-            Cipher cipher = Cipher.getInstance(AES_CIPHER);
+            Cipher cipher = Cipher.getInstance(aesCipherType.getValue());
             SecretKeySpec secretKeySpec = new SecretKeySpec(key, AES);
-            IvParameterSpec ivps = new IvParameterSpec(ivs);
-            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivps);
+            if( ivs == null)
+            {
+                cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+            } else {
+                IvParameterSpec ivps = new IvParameterSpec(ivs);
+                cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivps);
+            }
 
             ByteArrayInputStream bis = new ByteArrayInputStream(data);
             cis = new CipherInputStream(bis,cipher);
