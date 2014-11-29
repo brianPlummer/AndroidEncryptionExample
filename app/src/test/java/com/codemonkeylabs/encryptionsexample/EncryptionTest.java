@@ -2,6 +2,7 @@ package com.codemonkeylabs.encryptionsexample;
 
 import com.codemonkeylabs.encryptionexample.app.AESEncryptDecrypt;
 import com.codemonkeylabs.encryptionexample.app.RSAEncryptDecrypt;
+import com.codemonkeylabs.encryptionexample.app.Util;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -11,9 +12,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 /**
@@ -39,70 +43,129 @@ public class EncryptionTest
         testText = null;
     }
 
-    @Test
-    public void testAESEncryptionCTR()
-    {
-        AESEncryptDecrypt aesEncryptDecrypt = new AESEncryptDecrypt();
-        String encryptedString = aesEncryptDecrypt.encrypt(testText,
-                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
-                AESEncryptDecrypt.IVS.getBytes(),
-                AESEncryptDecrypt.AESCipherType.AES_CIPHER_CTR_NOPADDING);
 
-        String unencryptedString = aesEncryptDecrypt.decrypt(encryptedString,
-                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
-                AESEncryptDecrypt.IVS.getBytes(),
-                AESEncryptDecrypt.AESCipherType.AES_CIPHER_CTR_NOPADDING
-        );
+    @Test
+    public void testAESEncryptionCBC() throws UnsupportedEncodingException
+    {
+
+        ByteArrayInputStream plainTextInputStream = new ByteArrayInputStream(testText.getBytes("UTF-8"));
+        ByteArrayOutputStream encOutputStream = new ByteArrayOutputStream(1024 * 100);
+
+        byte[] iv = AESEncryptDecrypt.aesEncrypt(plainTextInputStream,
+                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.toCharArray(),
+                AESEncryptDecrypt.AESCipherType.AES_CBC_PKCS5PADDING,
+                encOutputStream);
+
+
+        ByteArrayInputStream encInputStream = new ByteArrayInputStream(encOutputStream.toByteArray());
+        ByteArrayOutputStream plainTextOutputStream = new ByteArrayOutputStream(1024 * 100);
+
+        AESEncryptDecrypt.aesDecrypt(encInputStream,
+                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.toCharArray(),
+                iv,
+                AESEncryptDecrypt.AESCipherType.AES_CBC_PKCS5PADDING,
+                plainTextOutputStream);
+
+
+        String unencryptedString = new String(plainTextOutputStream.toByteArray(),"UTF-8");
+
+        assertTrue(unencryptedString.startsWith("All this while Tashtego, Daggoo, and Queequeg"));
+    }
+
+
+    @Test
+    public void testAESEncryptionCTR() throws UnsupportedEncodingException
+    {
+        ByteArrayInputStream plainTextInputStream = new ByteArrayInputStream(testText.getBytes("UTF-8"));
+        ByteArrayOutputStream encOutputStream = new ByteArrayOutputStream(1024 * 100);
+
+        byte[] iv = AESEncryptDecrypt.aesEncrypt(plainTextInputStream,
+                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.toCharArray(),
+                AESEncryptDecrypt.AESCipherType.AES_CIPHER_CTR_NOPADDING,
+                encOutputStream);
+
+
+        ByteArrayInputStream encInputStream = new ByteArrayInputStream(encOutputStream.toByteArray());
+        ByteArrayOutputStream plainTextOutputStream = new ByteArrayOutputStream(1024 * 100);
+
+        AESEncryptDecrypt.aesDecrypt(encInputStream,
+                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.toCharArray(),
+                iv,
+                AESEncryptDecrypt.AESCipherType.AES_CIPHER_CTR_NOPADDING,
+                plainTextOutputStream);
+
+
+        String unencryptedString = new String(plainTextOutputStream.toByteArray(),"UTF-8");
+
+        assertTrue(unencryptedString.startsWith("All this while Tashtego, Daggoo, and Queequeg"));
+    }
+
+
+    @Test
+    public void testAESEncryptionECB() throws UnsupportedEncodingException
+    {
+        ByteArrayInputStream plainTextInputStream = new ByteArrayInputStream(testText.getBytes("UTF-8"));
+        ByteArrayOutputStream encOutputStream = new ByteArrayOutputStream(1024 * 100);
+
+        byte[] iv = AESEncryptDecrypt.aesEncrypt(plainTextInputStream,
+                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.toCharArray(),
+                AESEncryptDecrypt.AESCipherType.AES_CIPHER_ECB_PKCS5PADDING,
+                encOutputStream);
+
+
+        ByteArrayInputStream encInputStream = new ByteArrayInputStream(encOutputStream.toByteArray());
+        ByteArrayOutputStream plainTextOutputStream = new ByteArrayOutputStream(1024 * 100);
+
+        AESEncryptDecrypt.aesDecrypt(encInputStream,
+                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.toCharArray(),
+                iv,
+                AESEncryptDecrypt.AESCipherType.AES_CIPHER_ECB_PKCS5PADDING,
+                plainTextOutputStream);
+
+
+        String unencryptedString = new String(plainTextOutputStream.toByteArray(),"UTF-8");
+
         assertTrue(unencryptedString.startsWith("All this while Tashtego, Daggoo, and Queequeg"));
     }
 
     @Test
-    public void testAESEncryptionECB()
+    public void testRSAandAESEncryption() throws UnsupportedEncodingException
     {
-        AESEncryptDecrypt aesEncryptDecrypt = new AESEncryptDecrypt();
-        String encryptedString = aesEncryptDecrypt.encrypt(testText,
-                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
-                null,
-                AESEncryptDecrypt.AESCipherType.AES_CIPHER_ECB_PKCS5PADDING);
 
-        String unencryptedString = aesEncryptDecrypt.decrypt(encryptedString,
-                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
-                null,
-                AESEncryptDecrypt.AESCipherType.AES_CIPHER_ECB_PKCS5PADDING);
-        assertTrue(unencryptedString.startsWith("All this while Tashtego, Daggoo, and Queequeg"));
-    }
-
-    @Test
-    public void testRSAandAESEncryption()
-    {
-        AESEncryptDecrypt aesEncryptDecrypt = new AESEncryptDecrypt();
         RSAEncryptDecrypt rsaEncryptDecrypt = new RSAEncryptDecrypt();
-        String encryptedString = aesEncryptDecrypt.encrypt(testText,
-                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
-                AESEncryptDecrypt.IVS.getBytes(),
-                AESEncryptDecrypt.AESCipherType.AES_CIPHER_CTR_NOPADDING);
 
-        byte[] combined = concat(AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(), AESEncryptDecrypt.IVS.getBytes());
+
+        ByteArrayInputStream plainTextInputStream = new ByteArrayInputStream(testText.getBytes("UTF-8"));
+        ByteArrayOutputStream encOutputStream = new ByteArrayOutputStream(1024 * 100);
+
+        byte[] iv = AESEncryptDecrypt.aesEncrypt(plainTextInputStream,
+                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.toCharArray(),
+                AESEncryptDecrypt.AESCipherType.AES_CBC_PKCS5PADDING,
+                encOutputStream);
+
+
+        byte[] combined = Util.concat(AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
+                iv);
 
         byte[] encryptedAESKey = rsaEncryptDecrypt.encrypt(combined);
 
         byte[] unencryptedAESKey = rsaEncryptDecrypt.decrypt(encryptedAESKey);
 
-        byte[] aesKey = Arrays.copyOfRange(unencryptedAESKey, 0, 16);
-        byte[] ivs = Arrays.copyOfRange(unencryptedAESKey, 16, 32);
+        byte[] aesKey = Arrays.copyOfRange(unencryptedAESKey, 0, 32);
+        byte[] ivs = Arrays.copyOfRange(unencryptedAESKey, 32, 48);
 
-        String unencryptedString = aesEncryptDecrypt.decrypt(encryptedString,
-                aesKey,
+        ByteArrayInputStream encInputStream = new ByteArrayInputStream(encOutputStream.toByteArray());
+        ByteArrayOutputStream plainTextOutputStream = new ByteArrayOutputStream(1024 * 100);
+
+        AESEncryptDecrypt.aesDecrypt(encInputStream,
+                new String(aesKey, "UTF-8").toCharArray(),
                 ivs,
-                AESEncryptDecrypt.AESCipherType.AES_CIPHER_CTR_NOPADDING);
+                AESEncryptDecrypt.AESCipherType.AES_CBC_PKCS5PADDING,
+                plainTextOutputStream);
+
+        String unencryptedString = new String(plainTextOutputStream.toByteArray(),"UTF-8");
+
         assertTrue(unencryptedString.startsWith("All this while Tashtego, Daggoo, and Queequeg"));
     }
 
-    //helper function that concats two byte arrays
-    public byte[] concat(byte[] first, byte[] second){
-        byte[] combined = new byte[first.length + second.length];
-        System.arraycopy(first, 0, combined, 0, first.length);
-        System.arraycopy(second, 0, combined, first.length, second.length);
-        return combined;
-    }
 }

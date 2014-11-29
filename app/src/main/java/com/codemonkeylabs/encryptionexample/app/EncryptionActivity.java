@@ -9,6 +9,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import org.ow2.util.base64.Base64;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 public class EncryptionActivity extends Activity {
@@ -16,8 +21,9 @@ public class EncryptionActivity extends Activity {
     private Button encryptButton = null, decryptButton = null, clearButton = null;
     private EditText decryptedText = null, encryptedText = null, inputtedUnencryptedText = null ;
 
-    //helper encryption classes
-    private AESEncryptDecrypt aesEncryptDecrypt;
+    //helper RSA encryption class
+    //we have an instance of this because it stores
+    //the created rsa internally
     private RSAEncryptDecrypt rsaEncryptDecrypt;
 
     //encrypted aes key and ivs combined
@@ -29,7 +35,6 @@ public class EncryptionActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_encryption);
         wireUI();
-        this.aesEncryptDecrypt = new AESEncryptDecrypt();
         this.rsaEncryptDecrypt = new RSAEncryptDecrypt();
     }
 
@@ -85,7 +90,8 @@ public class EncryptionActivity extends Activity {
         });
     }
 
-    private void decryptButton(){
+    private void decryptButton()
+    {
 
         String encText = this.encryptedText.getText().toString();
 
@@ -94,14 +100,47 @@ public class EncryptionActivity extends Activity {
         {
             //decrypt the stored aes and ivs key
             byte[] decryptedAESKeyIVS = this.rsaEncryptDecrypt.decrypt(this.encryptedAESKey);
+            //we combined the aes key and iv earlier in encryptButton() now after we decrypted
+            //the value we split it up
+            byte[] aesKey = Arrays.copyOfRange(decryptedAESKeyIVS, 0, 32);
+            byte[] ivs = Arrays.copyOfRange(decryptedAESKeyIVS, 32, 48);
 
-            byte[] aesKey = Arrays.copyOfRange(decryptedAESKeyIVS, 0, 16);
-            byte[] ivs = Arrays.copyOfRange(decryptedAESKeyIVS, 16, 32);
+            char[] aesKeyChar = null;
+            try
+            {
+                //convert the binary aes key to a char array
+                aesKeyChar = new String(aesKey, "UTF-8").toCharArray();
+            } catch (UnsupportedEncodingException e)
+            {
+                e.printStackTrace();
+                return;
+            }
 
-            this.decryptedText.setText(this.aesEncryptDecrypt.decrypt(encText,
-                    aesKey,
+            //set up your streams for decryption
+            ByteArrayInputStream encInputStream = new ByteArrayInputStream(Base64.decode(encText.toCharArray()));
+            ByteArrayOutputStream plainTextOutputStream = new ByteArrayOutputStream(1024 * 100);
+            String unencryptedString = "";
+
+            //main aes decrypt function
+            AESEncryptDecrypt.aesDecrypt(encInputStream,
+                    aesKeyChar,
                     ivs,
-                    AESEncryptDecrypt.AESCipherType.AES_CIPHER_CTR_NOPADDING));
+                    AESEncryptDecrypt.AESCipherType.AES_CBC_PKCS5PADDING,
+                    plainTextOutputStream);
+
+            try
+            {
+                //convert decrypted outputstream to a string
+                unencryptedString = new String(plainTextOutputStream.toByteArray(),"UTF-8");
+            } catch (UnsupportedEncodingException e)
+            {
+                e.printStackTrace();
+                return;
+            }
+
+            //set decrypted text to the ui
+            this.decryptedText.setText(unencryptedString);
+
         }
     }
 
@@ -116,6 +155,7 @@ public class EncryptionActivity extends Activity {
     private void encryptButton()
     {
         String inputtedUnencryptedText = this.inputtedUnencryptedText.getText().toString();
+        ByteArrayInputStream plainTextInputStream;
 
         //sanity check on input
         if(TextUtils.isEmpty(inputtedUnencryptedText))
@@ -123,30 +163,35 @@ public class EncryptionActivity extends Activity {
             return;
         }
 
-        //encrypt the inputted text using AES
-        String encryptedText = aesEncryptDecrypt.encrypt(inputtedUnencryptedText,
-                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
-                AESEncryptDecrypt.IVS.getBytes(),
-                AESEncryptDecrypt.AESCipherType.AES_CIPHER_CTR_NOPADDING);
+
+        try
+        {
+            //create an inputstream from a string
+            plainTextInputStream = new ByteArrayInputStream(inputtedUnencryptedText.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e)
+        {
+            return;
+        }
+
+        ByteArrayOutputStream encOutputStream = new ByteArrayOutputStream(1024 * 100);
+
+        //main aes encrypt
+        byte[] iv = AESEncryptDecrypt.aesEncrypt(plainTextInputStream,
+                AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.toCharArray(),
+                AESEncryptDecrypt.AESCipherType.AES_CBC_PKCS5PADDING,
+                encOutputStream);
+
+        //combine the aes key and iv
+        byte[] combined = Util.concat(AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
+                iv);
+
+        //encrypt the combined keys using rsa and store the encrypted value
+        encryptedAESKey = rsaEncryptDecrypt.encrypt(combined);
 
         //set ui textview to encrypted base64 encoded value
-        this.encryptedText.setText(encryptedText);
+        String encryptedString = new String(Base64.encode(encOutputStream.toByteArray()));
+        this.encryptedText.setText(encryptedString);
 
-
-        //we combine the aes key and the ivs so we can encrypt it in one go
-        byte[] combinedKey = concat(AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
-                AESEncryptDecrypt.IVS.getBytes());
-
-        //we encrypt the combined key and store it for decryption later
-        encryptedAESKey = this.rsaEncryptDecrypt.encrypt(combinedKey);
-    }
-
-    //helper function that concats two byte arrays
-    public byte[] concat(byte[] first, byte[] second){
-        byte[] combined = new byte[first.length + second.length];
-        System.arraycopy(first, 0, combined, 0, first.length);
-        System.arraycopy(second, 0, combined, first.length, second.length);
-        return combined;
     }
 
 }

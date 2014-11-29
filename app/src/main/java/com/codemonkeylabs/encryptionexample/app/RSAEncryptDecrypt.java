@@ -16,6 +16,11 @@ import javax.crypto.NoSuchPaddingException;
  */
 public class RSAEncryptDecrypt {
 
+    //key length
+    public static final int KEY_LENGTH = 2048;
+    //main family of rsa
+    public static final String RSA = "RSA";
+
     private KeyPair keyPair = null;
 
     public RSAEncryptDecrypt()
@@ -23,13 +28,13 @@ public class RSAEncryptDecrypt {
         KeyPairGenerator kpg = null;
         try
         {
-            kpg = KeyPairGenerator.getInstance("RSA");
+            kpg = KeyPairGenerator.getInstance(RSA);
         }
         catch (NoSuchAlgorithmException e)
         {
             throw new RuntimeException(e);
         }
-        kpg.initialize(2048);
+        kpg.initialize(KEY_LENGTH);
         this.keyPair = kpg.genKeyPair();
     }
 
@@ -38,7 +43,7 @@ public class RSAEncryptDecrypt {
         byte[] enc = null;
         try
         {
-            Cipher cipher = Cipher.getInstance("RSA");
+            Cipher cipher = Cipher.getInstance(RSA);
             cipher.init(Cipher.ENCRYPT_MODE, this.keyPair.getPublic());
             enc = cipher.doFinal(plain);
         }
@@ -70,7 +75,7 @@ public class RSAEncryptDecrypt {
         byte[] plain = null;
         try
         {
-            Cipher cipher = Cipher.getInstance("RSA");
+            Cipher cipher = Cipher.getInstance(RSA);
             cipher.init(Cipher.DECRYPT_MODE, this.keyPair.getPrivate());
             plain = cipher.doFinal(enc);
         }

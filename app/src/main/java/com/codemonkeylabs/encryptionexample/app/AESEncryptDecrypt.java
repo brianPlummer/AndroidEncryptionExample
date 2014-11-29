@@ -3,16 +3,22 @@ package com.codemonkeylabs.encryptionexample.app;
 
 
 import org.apache.commons.io.IOUtils;
-import org.ow2.util.base64.Base64;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.AlgorithmParameters;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
@@ -21,18 +27,23 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class AESEncryptDecrypt {
 
-    public static final int BYTE_BUFFER_SIZE = 1024 * 100;//100k
-
-    //16 byte key....other sizes allowed.....getBytes defaults to utf-8
-    public static final String NOT_SECRET_ENCRYPTION_KEY = "1234567812345678";
-    //Must be 16 bytes long....getBytes defaults to utf-8
-    public static final String IVS = "1234567812345678";
-
+    //32 byte key -> 256 bit.....getBytes defaults to utf-8
+    public static final String NOT_SECRET_ENCRYPTION_KEY = "12345678123456781234567812345678";
+    //type of aes key that will be created
+    public static final String SECRET_KEY_TYPE = "PBKDF2WithHmacSHA1";
+    //value used for salting....can be anything
+    public static final String salt = "some_salt";
+    //length of key
+    public static final int KEY_LENGTH = 256;
+    //number of times the password is hashed
+    public static final int ITERATION_COUNT = 65536;
+    //main family of aes
     public static final String AES = "AES";
 
     public enum AESCipherType {
         AES_CIPHER_CTR_NOPADDING("AES/CTR/NOPADDING"),
-        AES_CIPHER_ECB_PKCS5PADDING("AES/ECB/PKCS5PADDING");
+        AES_CIPHER_ECB_PKCS5PADDING("AES/ECB/PKCS5PADDING"),
+        AES_CBC_PKCS5PADDING("AES/CBC/PKCS5Padding");
 
         private final String value;
 
@@ -45,54 +56,39 @@ public class AESEncryptDecrypt {
         }
     }
 
-    public String encrypt(String inData,
-                          byte[] key,
-                          byte[] ivs,
-                          AESCipherType aesCipherType)
-    {
-        byte[] encryptedData = aesEncrypt(inData.getBytes(),
-                key,
-                ivs,
-                aesCipherType);
-        return new String(Base64.encode(encryptedData));
-    }
-
-    public String decrypt(String inData,
-                          byte[] key,
-                          byte[] ivs,
-                          AESCipherType aesCipherType)
-    {
-        byte[] decryptData = aesDecrypt(Base64.decode(inData.toCharArray()),
-                key,
-                ivs,
-                aesCipherType);
-        return new String(decryptData);
-    }
-
-
-    public static byte[] aesEncrypt(byte[] data, byte[] key, byte[] ivs, AESCipherType aesCipherType)
+    /**
+     * main aes encryption method.  takes in the unencrypted data
+     * as an inputstream and writes out the encrypted data
+     * within the provided outputstream
+     *
+     * @param inData inputStream that represents the plaintext data
+     * @param key unencoded and unencrypted aes key
+     * @param aesCipherType enum representing what ciper to use boils down to a string
+     * @param outData  outputstream where we write the encrypted data
+     * @return IV generated from key creation
+     */
+    public static byte[] aesEncrypt(InputStream inData,
+                                    char[] key,
+                                    AESEncryptDecrypt.AESCipherType aesCipherType,
+                                    OutputStream outData)
     {
         CipherOutputStream cos = null;
-        ByteArrayOutputStream bos = null;
         try
         {
             Cipher cipher = Cipher.getInstance(aesCipherType.getValue());
+            //generate secret key
+            SecretKey secret = getSecretKey(key);
 
-            SecretKeySpec secretKeySpec = new SecretKeySpec(key, AES);
-            if( ivs == null)
-            {
-                cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
-            } else {
-                IvParameterSpec ivps = new IvParameterSpec(ivs);
-                cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivps);
-            }
+            cipher.init(Cipher.ENCRYPT_MODE, secret);
 
-            bos = new ByteArrayOutputStream(BYTE_BUFFER_SIZE);
-            cos = new CipherOutputStream(bos,cipher);
-            ByteArrayInputStream bis = new ByteArrayInputStream(data);
+            cos = new CipherOutputStream(outData, cipher);
 
-            IOUtils.copy(bis, cos);
-            return bos.toByteArray();
+            IOUtils.copy(inData, cos);
+            //query parameters for iv
+            AlgorithmParameters params = cipher.getParameters();
+            //check to see if we have an IV to return
+            //some ciphers (ECB) don't create IV
+            return params == null ? null : params.getParameterSpec(IvParameterSpec.class).getIV();
         }
         catch (Exception e)
         {
@@ -110,27 +106,57 @@ public class AESEncryptDecrypt {
         }
     }
 
-    public static byte[] aesDecrypt(byte[] data, byte[] key, byte[] ivs, AESCipherType aesCipherType)
+    private static SecretKey getSecretKey(char[] key) throws NoSuchAlgorithmException,
+            UnsupportedEncodingException,
+            InvalidKeySpecException
     {
-        byte[] retData = null;
+        SecretKeyFactory factory = null;
+        factory = SecretKeyFactory.getInstance(SECRET_KEY_TYPE);
+
+        KeySpec spec = new PBEKeySpec(key,
+                salt.getBytes("UTF-8"),
+                ITERATION_COUNT,
+                KEY_LENGTH);
+
+        SecretKey tmp = factory.generateSecret(spec);
+        return new SecretKeySpec(tmp.getEncoded(), AES);
+    }
+
+    /**
+     * main aes decryption method. takes in the encrypted data
+     * inputstream and writes the decrypted data to the provided
+     * outputstream.
+     *
+     * @param inData inputStream that represents the encrypted data
+     * @param key unencoded and unencrypted aes key
+     * @param ivs unencoded and unencrypted iv
+     * @param aesCipherType enum representing what ciper to use boils down to a string
+     * @param outData outputstream where we write the decrypted data
+     */
+    public static void aesDecrypt(InputStream inData,
+                                  char[] key,
+                                  byte[] ivs,
+                                  AESEncryptDecrypt.AESCipherType aesCipherType,
+                                  OutputStream outData)
+    {
         CipherInputStream cis = null;
         try
         {
             Cipher cipher = Cipher.getInstance(aesCipherType.getValue());
-            SecretKeySpec secretKeySpec = new SecretKeySpec(key, AES);
+            //generate secret key
+            SecretKey secret = getSecretKey(key);
+            //if ivs is passed in then we should use it to create the
+            //cipher
             if( ivs == null)
             {
-                cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+                cipher.init(Cipher.DECRYPT_MODE, secret);
             } else {
                 IvParameterSpec ivps = new IvParameterSpec(ivs);
-                cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivps);
+                cipher.init(Cipher.DECRYPT_MODE, secret, ivps);
             }
 
-            ByteArrayInputStream bis = new ByteArrayInputStream(data);
-            cis = new CipherInputStream(bis,cipher);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream(BYTE_BUFFER_SIZE);
-            IOUtils.copy(cis,bos);
-            retData =  bos.toByteArray();
+            cis = new CipherInputStream(inData, cipher);
+            IOUtils.copy(cis,outData);
         }
         catch (Exception e)
         {
@@ -146,7 +172,6 @@ public class AESEncryptDecrypt {
                     throw new RuntimeException(e);
                 }
         }
-        return retData;
     }
 
 }
