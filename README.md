@@ -1,6 +1,36 @@
 Android Encryption Example
 ========================
 
-This is a basic example of using RSA and AES encryption in Android.  This example encrypts an inputted string using 
-AES and then encrypts the AES key using RSA.  The AES encryption methods use streams and can be modified to handle 
-data of arbitrary sizes.  The examples provided use AES Counter (CTR) and Electronic codebook (ECB).
+This is an encryption example of RSA and AES (CBC, ECB, CTR) 256 bit key on android with unit tests. I have 
+tried to provide a good and secure example by showcasing:
+
+* AES 256 bit key
+* CBC/CTR/ECB example
+* using salt for key derivation
+* streams for arbitrary data sizes
+* unit tests
+* RSA 2048
+
+The example encrypts the inputted string using AES, encrypts the key via RSA, and does the reverse when
+the decrypt button is clicked.
+
+Here are the helper methods for encrypting/decrypting AES.
+
+```java
+
+ public static byte[] aesEncrypt(InputStream inData,
+                                    char[] key,
+                                    AESEncryptDecrypt.AESCipherType aesCipherType,
+                                    OutputStream outData)
+
+```
+
+```java
+
+public static void aesDecrypt(InputStream inData,
+                                  char[] key,
+                                  byte[] ivs,
+                                  AESEncryptDecrypt.AESCipherType aesCipherType,
+                                  OutputStream outData)
+
+```
