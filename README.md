@@ -14,23 +14,3 @@ tried to provide a good and secure example by showcasing:
 The example encrypts the inputted string using AES, encrypts the key via RSA, and does the reverse when
 the decrypt button is clicked.
 
-Here are the helper methods for encrypting/decrypting AES.
-
-```java
-
- public static byte[] aesEncrypt(InputStream inData,
-                                    char[] key,
-                                    AESEncryptDecrypt.AESCipherType aesCipherType,
-                                    OutputStream outData)
-
-```
-
-```java
-
-public static void aesDecrypt(InputStream inData,
-                                  char[] key,
-                                  byte[] ivs,
-                                  AESEncryptDecrypt.AESCipherType aesCipherType,
-                                  OutputStream outData)
-
-```
