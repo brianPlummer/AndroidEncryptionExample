@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.KeyPair;
 import java.util.Arrays;
 
 /**
@@ -132,7 +133,7 @@ public class EncryptionTest
     public void testRSAandAESEncryption() throws UnsupportedEncodingException
     {
 
-        RSAEncryptDecrypt rsaEncryptDecrypt = new RSAEncryptDecrypt();
+        KeyPair rsaKeyPair = RSAEncryptDecrypt.generateRSAKey();
 
 
         ByteArrayInputStream plainTextInputStream = new ByteArrayInputStream(testText.getBytes("UTF-8"));
@@ -147,9 +148,9 @@ public class EncryptionTest
         byte[] combined = Util.concat(AESEncryptDecrypt.NOT_SECRET_ENCRYPTION_KEY.getBytes(),
                 iv);
 
-        byte[] encryptedAESKey = rsaEncryptDecrypt.encrypt(combined);
+        byte[] encryptedAESKey = RSAEncryptDecrypt.encryptRSA(combined, rsaKeyPair.getPublic());
 
-        byte[] unencryptedAESKey = rsaEncryptDecrypt.decrypt(encryptedAESKey);
+        byte[] unencryptedAESKey = RSAEncryptDecrypt.decryptRSA(encryptedAESKey, rsaKeyPair.getPrivate());
 
         byte[] aesKey = Arrays.copyOfRange(unencryptedAESKey, 0, 32);
         byte[] ivs = Arrays.copyOfRange(unencryptedAESKey, 32, 48);

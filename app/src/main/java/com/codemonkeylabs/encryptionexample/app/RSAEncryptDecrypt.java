@@ -4,6 +4,8 @@ import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -21,9 +23,8 @@ public class RSAEncryptDecrypt {
     //main family of rsa
     public static final String RSA = "RSA";
 
-    private KeyPair keyPair = null;
 
-    public RSAEncryptDecrypt()
+    public static KeyPair generateRSAKey()
     {
         KeyPairGenerator kpg = null;
         try
@@ -35,67 +36,39 @@ public class RSAEncryptDecrypt {
             throw new RuntimeException(e);
         }
         kpg.initialize(KEY_LENGTH);
-        this.keyPair = kpg.genKeyPair();
+        return kpg.genKeyPair();
     }
 
-    public byte[] encrypt(byte[] plain)
+
+    public static byte[] encryptRSA(byte[] plain, PublicKey publicKey)
     {
         byte[] enc = null;
         try
         {
             Cipher cipher = Cipher.getInstance(RSA);
-            cipher.init(Cipher.ENCRYPT_MODE, this.keyPair.getPublic());
+            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
             enc = cipher.doFinal(plain);
         }
-        catch (NoSuchAlgorithmException e)
+        //no need to catch 4 different exceptions
+        catch (Exception e)
         {
             throw new RuntimeException(e);
         }
-        catch (NoSuchPaddingException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (InvalidKeyException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (BadPaddingException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (IllegalBlockSizeException e)
-        {
-            throw new RuntimeException(e);
-        }
+
         return enc;
     }
 
-    public byte[] decrypt(byte[] enc)
+    public static byte[] decryptRSA(byte[] enc, PrivateKey privateKey)
     {
         byte[] plain = null;
         try
         {
             Cipher cipher = Cipher.getInstance(RSA);
-            cipher.init(Cipher.DECRYPT_MODE, this.keyPair.getPrivate());
+            cipher.init(Cipher.DECRYPT_MODE, privateKey);
             plain = cipher.doFinal(enc);
         }
-        catch (NoSuchAlgorithmException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (NoSuchPaddingException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (InvalidKeyException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (BadPaddingException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (IllegalBlockSizeException e)
+        //no need to catch 4 different exceptions
+        catch (Exception e)
         {
             throw new RuntimeException(e);
         }

@@ -14,6 +14,7 @@ import org.ow2.util.base64.Base64;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.KeyPair;
 import java.util.Arrays;
 
 public class EncryptionActivity extends Activity {
@@ -21,10 +22,8 @@ public class EncryptionActivity extends Activity {
     private Button encryptButton = null, decryptButton = null, clearButton = null;
     private EditText decryptedText = null, encryptedText = null, inputtedUnencryptedText = null ;
 
-    //helper RSA encryption class
-    //we have an instance of this because it stores
-    //the created rsa internally
-    private RSAEncryptDecrypt rsaEncryptDecrypt;
+    //RSA key pair (public and private)
+    private KeyPair rsaKey = null;
 
     //encrypted aes key and ivs combined
     private byte[] encryptedAESKey = null;
@@ -35,7 +34,7 @@ public class EncryptionActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_encryption);
         wireUI();
-        this.rsaEncryptDecrypt = new RSAEncryptDecrypt();
+        this.rsaKey = RSAEncryptDecrypt.generateRSAKey();
     }
 
     @Override
@@ -99,7 +98,8 @@ public class EncryptionActivity extends Activity {
         if(encText!=null && encText.trim().length()>0)
         {
             //decrypt the stored aes and ivs key
-            byte[] decryptedAESKeyIVS = this.rsaEncryptDecrypt.decrypt(this.encryptedAESKey);
+
+            byte[] decryptedAESKeyIVS = RSAEncryptDecrypt.decryptRSA(this.encryptedAESKey, this.rsaKey.getPrivate());
             //we combined the aes key and iv earlier in encryptButton() now after we decrypted
             //the value we split it up
             byte[] aesKey = Arrays.copyOfRange(decryptedAESKeyIVS, 0, 32);
@@ -186,7 +186,7 @@ public class EncryptionActivity extends Activity {
                 iv);
 
         //encrypt the combined keys using rsa and store the encrypted value
-        encryptedAESKey = rsaEncryptDecrypt.encrypt(combined);
+        encryptedAESKey = RSAEncryptDecrypt.encryptRSA(combined, this.rsaKey.getPublic());
 
         //set ui textview to encrypted base64 encoded value
         String encryptedString = new String(Base64.encode(encOutputStream.toByteArray()));
