@@ -1,17 +1,14 @@
 package com.codemonkeylabs.encryptionexample.app;
 
-import java.security.InvalidKeyException;
+import android.util.Log;
+
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-
 /**
  * RSA Helper Encryption Class
  * Created by brianplummer on 4/29/14.
@@ -23,23 +20,35 @@ public class RSAEncryptDecrypt {
     //main family of rsa
     public static final String RSA = "RSA";
 
-
+    /*
+     * generate a 2048 bit RSA key
+     */
     public static KeyPair generateRSAKey()
     {
         KeyPairGenerator kpg = null;
         try
         {
+            //get an RSA key generator
             kpg = KeyPairGenerator.getInstance(RSA);
         }
         catch (NoSuchAlgorithmException e)
         {
+            Log.e(RSAEncryptDecrypt.class.getName(), e.getMessage(), e);
             throw new RuntimeException(e);
         }
+        //initialize the key to 2048 bits
         kpg.initialize(KEY_LENGTH);
+        //return the generated key pair
         return kpg.genKeyPair();
     }
 
-
+    /**
+     * main RSA encrypt method
+     *
+     * @param plain     plain text you want to encrypt
+     * @param publicKey public key to encrypt with
+     * @return          encrypted text
+     */
     public static byte[] encryptRSA(byte[] plain, PublicKey publicKey)
     {
         byte[] enc = null;
@@ -52,12 +61,20 @@ public class RSAEncryptDecrypt {
         //no need to catch 4 different exceptions
         catch (Exception e)
         {
+            Log.e(RSAEncryptDecrypt.class.getName(), e.getMessage(), e);
             throw new RuntimeException(e);
         }
 
         return enc;
     }
 
+    /**
+     *  main RSA decrypt method
+     *
+     * @param enc           encrypted text you want to dcrypt
+     * @param privateKey    private key to use for decryption
+     * @return              plain text
+     */
     public static byte[] decryptRSA(byte[] enc, PrivateKey privateKey)
     {
         byte[] plain = null;
@@ -70,6 +87,7 @@ public class RSAEncryptDecrypt {
         //no need to catch 4 different exceptions
         catch (Exception e)
         {
+            Log.e(RSAEncryptDecrypt.class.getName(), e.getMessage(), e);
             throw new RuntimeException(e);
         }
         return plain;

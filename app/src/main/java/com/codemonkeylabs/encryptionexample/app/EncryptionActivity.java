@@ -3,6 +3,7 @@ package com.codemonkeylabs.encryptionexample.app;
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -95,10 +96,9 @@ public class EncryptionActivity extends Activity {
         String encText = this.encryptedText.getText().toString();
 
         //sanity test on input from ui
-        if(encText!=null && encText.trim().length()>0)
+        if (encText != null && encText.trim().length() > 0)
         {
             //decrypt the stored aes and ivs key
-
             byte[] decryptedAESKeyIVS = RSAEncryptDecrypt.decryptRSA(this.encryptedAESKey, this.rsaKey.getPrivate());
             //we combined the aes key and iv earlier in encryptButton() now after we decrypted
             //the value we split it up
@@ -112,7 +112,7 @@ public class EncryptionActivity extends Activity {
                 aesKeyChar = new String(aesKey, "UTF-8").toCharArray();
             } catch (UnsupportedEncodingException e)
             {
-                e.printStackTrace();
+                Log.e(EncryptionActivity.class.getName(), e.getMessage(), e);
                 return;
             }
 
@@ -134,7 +134,7 @@ public class EncryptionActivity extends Activity {
                 unencryptedString = new String(plainTextOutputStream.toByteArray(),"UTF-8");
             } catch (UnsupportedEncodingException e)
             {
-                e.printStackTrace();
+                Log.e(EncryptionActivity.class.getName(), e.getMessage(), e);
                 return;
             }
 
@@ -158,11 +158,10 @@ public class EncryptionActivity extends Activity {
         ByteArrayInputStream plainTextInputStream;
 
         //sanity check on input
-        if(TextUtils.isEmpty(inputtedUnencryptedText))
+        if (TextUtils.isEmpty(inputtedUnencryptedText))
         {
             return;
         }
-
 
         try
         {
@@ -170,6 +169,7 @@ public class EncryptionActivity extends Activity {
             plainTextInputStream = new ByteArrayInputStream(inputtedUnencryptedText.getBytes("UTF-8"));
         } catch (UnsupportedEncodingException e)
         {
+            Log.e(EncryptionActivity.class.getName(), e.getMessage(), e);
             return;
         }
 

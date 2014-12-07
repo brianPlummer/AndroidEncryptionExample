@@ -1,6 +1,7 @@
 package com.codemonkeylabs.encryptionexample.app;
 
 
+import android.util.Log;
 
 import org.apache.commons.io.IOUtils;
 import java.io.IOException;
@@ -40,6 +41,10 @@ public class AESEncryptDecrypt {
     //main family of aes
     public static final String AES = "AES";
 
+    /*
+     * helper enum class that contains the aes ciphers that we
+     * support
+     */
     public enum AESCipherType {
         AES_CIPHER_CTR_NOPADDING("AES/CTR/NOPADDING"),
         AES_CIPHER_ECB_PKCS5PADDING("AES/ECB/PKCS5PADDING"),
@@ -92,6 +97,7 @@ public class AESEncryptDecrypt {
         }
         catch (Exception e)
         {
+            Log.e(AESEncryptDecrypt.class.getName(), e.getMessage(), e);
             throw new RuntimeException(e);
         }
         finally
@@ -101,11 +107,17 @@ public class AESEncryptDecrypt {
                 {
                     cos.close();
                 } catch (IOException e) {
+                    Log.e(AESEncryptDecrypt.class.getName(), e.getMessage(), e);
                     throw new RuntimeException(e);
                 }
         }
     }
 
+    /*
+     * generates a secret key from the passed in raw key value
+     * we create a 256 bit key that is salted using our example
+     * salt value above
+     */
     private static SecretKey getSecretKey(char[] key) throws NoSuchAlgorithmException,
             UnsupportedEncodingException,
             InvalidKeySpecException
@@ -160,6 +172,7 @@ public class AESEncryptDecrypt {
         }
         catch (Exception e)
         {
+            Log.e(AESEncryptDecrypt.class.getName(), e.getMessage(), e);
             throw new RuntimeException(e);
         }
         finally
@@ -169,6 +182,7 @@ public class AESEncryptDecrypt {
                 {
                     cis.close();
                 } catch (IOException e) {
+                    Log.e(AESEncryptDecrypt.class.getName(), e.getMessage(), e);
                     throw new RuntimeException(e);
                 }
         }
