@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
 
-        classpath 'com.android.tools.build:gradle:0.13.3'
+        classpath 'com.android.tools.build:gradle:0.14.4'
         classpath 'org.robolectric:robolectric-gradle-plugin:0.13.2'
 
     }
@@ -17,7 +17,7 @@ apply plugin: 'robolectric'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.1.0"
+    buildToolsVersion "21.1.1"
 
     defaultConfig {
         minSdkVersion 14
