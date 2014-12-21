@@ -113,10 +113,16 @@ public class AESEncryptDecrypt {
         }
     }
 
-    /*
+    /**
      * generates a secret key from the passed in raw key value
      * we create a 256 bit key that is salted using our example
      * salt value above
+     *
+     * @param key input key in a char array
+     * @return a salted key of the type SECRET_KEY_TYPE
+     * @throws NoSuchAlgorithmException
+     * @throws UnsupportedEncodingException
+     * @throws InvalidKeySpecException
      */
     private static SecretKey getSecretKey(char[] key) throws NoSuchAlgorithmException,
             UnsupportedEncodingException,

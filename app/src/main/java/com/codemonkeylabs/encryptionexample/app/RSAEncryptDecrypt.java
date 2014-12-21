@@ -20,8 +20,10 @@ public class RSAEncryptDecrypt {
     //main family of rsa
     public static final String RSA = "RSA";
 
-    /*
+    /**
      * generate a 2048 bit RSA key
+     *
+     * @return a 2048 bit rsa key
      */
     public static KeyPair generateRSAKey()
     {
