@@ -3,13 +3,14 @@ package com.codemonkeylabs.encryptionexample.app;
 
 import android.util.Log;
 
-import org.apache.commons.io.IOUtils;
+//import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.AlgorithmParameters;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 
@@ -40,6 +41,13 @@ public class AESEncryptDecrypt {
     public static final int ITERATION_COUNT = 65536;
     //main family of aes
     public static final String AES = "AES";
+    //spongy castle security provider
+    public static final String SECURITY_PROVIDER = "SC";
+
+    // register the spongy castle security provider
+    static {
+        Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
+    }
 
     /*
      * helper enum class that contains the aes ciphers that we
@@ -80,15 +88,16 @@ public class AESEncryptDecrypt {
         CipherOutputStream cos = null;
         try
         {
-            Cipher cipher = Cipher.getInstance(aesCipherType.getValue());
+            //create the cipher from the passed in type using the specified security provider
+            Cipher cipher = Cipher.getInstance(aesCipherType.getValue(), SECURITY_PROVIDER);
             //generate secret key
             SecretKey secret = getSecretKey(key);
-
+            //init the cipher
             cipher.init(Cipher.ENCRYPT_MODE, secret);
-
+            //create the cipher outputstream
             cos = new CipherOutputStream(outData, cipher);
-
-            IOUtils.copy(inData, cos);
+            //copy the plaintext inputstream to the encrypted outputstream
+            Util.copy(inData, cos);
             //query parameters for iv
             AlgorithmParameters params = cipher.getParameters();
             //check to see if we have an IV to return
@@ -105,6 +114,7 @@ public class AESEncryptDecrypt {
             if(cos != null)
                 try
                 {
+                    //close the stream
                     cos.close();
                 } catch (IOException e) {
                     Log.e(AESEncryptDecrypt.class.getName(), e.getMessage(), e);
@@ -160,7 +170,8 @@ public class AESEncryptDecrypt {
         CipherInputStream cis = null;
         try
         {
-            Cipher cipher = Cipher.getInstance(aesCipherType.getValue());
+            //create the cipher from the passed in type using the specified security provider
+            Cipher cipher = Cipher.getInstance(aesCipherType.getValue(), SECURITY_PROVIDER);
             //generate secret key
             SecretKey secret = getSecretKey(key);
             //if ivs is passed in then we should use it to create the
@@ -172,9 +183,10 @@ public class AESEncryptDecrypt {
                 IvParameterSpec ivps = new IvParameterSpec(ivs);
                 cipher.init(Cipher.DECRYPT_MODE, secret, ivps);
             }
-
+            //create the cipher inputstream
             cis = new CipherInputStream(inData, cipher);
-            IOUtils.copy(cis,outData);
+            //copy the encrypted inputstream to the plaintext outputstream
+            Util.copy(cis, outData);
         }
         catch (Exception e)
         {
@@ -186,6 +198,7 @@ public class AESEncryptDecrypt {
             if(cis != null)
                 try
                 {
+                    //close the stream
                     cis.close();
                 } catch (IOException e) {
                     Log.e(AESEncryptDecrypt.class.getName(), e.getMessage(), e);
