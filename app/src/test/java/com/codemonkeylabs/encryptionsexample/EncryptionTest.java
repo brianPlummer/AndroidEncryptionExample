@@ -1,6 +1,9 @@
 package com.codemonkeylabs.encryptionsexample;
 
+import android.test.InstrumentationTestCase;
+
 import com.codemonkeylabs.encryptionexample.app.AESEncryptDecrypt;
+import com.codemonkeylabs.encryptionexample.app.R;
 import com.codemonkeylabs.encryptionexample.app.RSAEncryptDecrypt;
 import com.codemonkeylabs.encryptionexample.app.Util;
 
@@ -8,15 +11,10 @@ import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import static org.junit.Assert.assertTrue;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.KeyPair;
 import java.util.Arrays;
@@ -24,17 +22,16 @@ import java.util.Arrays;
 /**
  * Created by brianplummer on 9/2/14.
  */
-@RunWith(JUnit4.class)
-public class EncryptionTest
+public class EncryptionTest extends InstrumentationTestCase
 {
 
     private String testText = null;
 
     @Before
-    public void setUp() throws IOException
+    protected void setUp() throws IOException
     {
-        File mobyDickFile = new File("src/test/resources/moby_dick.txt");
-        FileInputStream fis = new FileInputStream(mobyDickFile);
+        //todo...look into using test resource instead of app resource.....
+        InputStream fis = getInstrumentation().getTargetContext().getResources().openRawResource(R.raw.moby_dick);
         testText = IOUtils.toString(fis);
     }
 

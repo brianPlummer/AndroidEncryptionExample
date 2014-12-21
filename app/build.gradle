@@ -7,13 +7,11 @@ buildscript {
     dependencies {
 
         classpath 'com.android.tools.build:gradle:0.14.4'
-        classpath 'org.robolectric:robolectric-gradle-plugin:0.14.+'
 
     }
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'robolectric'
 
 android {
     compileSdkVersion 21
@@ -36,23 +34,25 @@ android {
             setRoot('src/test')
         }
     }
-}
 
-robolectric {
-    // configure the set of classes for JUnit tests
-    include '**/*Test.class'
-
-    // configure max heap size of the test JVM
-    maxHeapSize = "2048m"
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:19.+'
-    compile 'org.apache.commons:commons-io:1.3.2'
-    compile 'org.ow2.util.base64:base64:2.0.0'
 
-    androidTestCompile 'org.apache.commons:commons-io:1.3.2'
+    compile 'com.android.support:appcompat-v7:19.+'
+    compile 'org.ow2.util.base64:base64:2.0.0'
+    compile 'com.madgag.spongycastle:prov:1.51.0.0'
+
     androidTestCompile 'junit:junit:4.11'
+    androidTestCompile 'org.apache.commons:commons-io:1.3.2'
 }
 
-
+android {
+    packagingOptions{
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+    }
+}
