@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.AlgorithmParameters;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
@@ -136,10 +137,12 @@ public class AESEncryptDecrypt {
      */
     private static SecretKey getSecretKey(char[] key) throws NoSuchAlgorithmException,
             UnsupportedEncodingException,
-            InvalidKeySpecException
+            InvalidKeySpecException,
+            NoSuchProviderException
     {
         SecretKeyFactory factory = null;
-        factory = SecretKeyFactory.getInstance(SECRET_KEY_TYPE);
+        factory = SecretKeyFactory.getInstance(SECRET_KEY_TYPE,
+                SECURITY_PROVIDER);
 
         KeySpec spec = new PBEKeySpec(key,
                 salt.getBytes("UTF-8"),
