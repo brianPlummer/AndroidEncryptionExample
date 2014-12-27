@@ -4,6 +4,6 @@
     <string name="app_name">EncryptionExample</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="default_hint">Merry Christmas!</string>
+    <string name="default_hint">I\'m not typing anything in here! You\'re nuts!</string>
 
 </resources>
