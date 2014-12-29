@@ -10,6 +10,7 @@ tried to provide a good and secure example by showcasing:
 * streams for arbitrary data sizes
 * unit tests
 * RSA 2048
+* Spongy Castle (Android version of Bouncy Castle encryption library)
 
 The example encrypts the inputted string using AES, encrypts the key via RSA, and does the reverse when
 the decrypt button is clicked.
