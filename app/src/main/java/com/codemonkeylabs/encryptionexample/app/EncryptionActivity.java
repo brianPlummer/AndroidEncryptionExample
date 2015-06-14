@@ -35,6 +35,8 @@ public class EncryptionActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_encryption);
         wireUI();
+        // specify spongyCastle for android runtime provider
+        AESEncryptDecrypt.setProvider(new org.spongycastle.jce.provider.BouncyCastleProvider(), "SC");
         this.rsaKey = RSAEncryptDecrypt.generateRSAKey();
     }
 

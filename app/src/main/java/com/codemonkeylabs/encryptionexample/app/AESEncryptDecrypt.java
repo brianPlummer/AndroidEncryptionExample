@@ -3,7 +3,6 @@ package com.codemonkeylabs.encryptionexample.app;
 
 import android.util.Log;
 
-//import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.AlgorithmParameters;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.Provider;
 import java.security.Security;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
@@ -43,11 +43,18 @@ public class AESEncryptDecrypt {
     //main family of aes
     public static final String AES = "AES";
     //spongy castle security provider
-    public static final String SECURITY_PROVIDER = "SC";
+    public static String SECURITY_PROVIDER = "SC";
 
-    // register the spongy castle security provider
-    static {
-        Security.insertProviderAt(new org.spongycastle.jce.provider.BouncyCastleProvider(), 1);
+    /*
+     * YOU HAVE TO CALL THIS BEFORE ENCRYPT/DECRYPT TO SET PROVIDER
+     * i added it this way for ease of distinction when unit testing...
+     * unit test requires bouncyCastle and on android we want
+     * spongyCastle....in the real world you would inject this
+     * dependency via dagger..
+     */
+    public static void setProvider(Provider provider, String providerName) {
+        SECURITY_PROVIDER = providerName;
+        Security.insertProviderAt(provider, 1);
     }
 
     /*

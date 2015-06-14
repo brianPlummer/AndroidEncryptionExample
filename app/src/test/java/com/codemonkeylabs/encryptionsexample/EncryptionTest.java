@@ -3,7 +3,6 @@ package com.codemonkeylabs.encryptionsexample;
 import android.test.InstrumentationTestCase;
 
 import com.codemonkeylabs.encryptionexample.app.AESEncryptDecrypt;
-import com.codemonkeylabs.encryptionexample.app.R;
 import com.codemonkeylabs.encryptionexample.app.RSAEncryptDecrypt;
 import com.codemonkeylabs.encryptionexample.app.Util;
 
@@ -11,28 +10,38 @@ import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.security.KeyPair;
 import java.util.Arrays;
 
 /**
  * Created by brianplummer on 9/2/14.
  */
-public class EncryptionTest extends InstrumentationTestCase
+public class EncryptionTest
 {
-
     private String testText = null;
 
     @Before
-    protected void setUp() throws IOException
+    public void setUp() throws Exception
     {
-        //todo...look into using test resource instead of app resource.....
-        InputStream fis = getInstrumentation().getTargetContext().getResources().openRawResource(R.raw.moby_dick);
+
+        File file = new File("./","/src/test/res/moby_dick.txt");
+        FileInputStream fis = new FileInputStream(file);
         testText = IOUtils.toString(fis);
+        // specify bouncyCastle provider for unit test runtime
+        AESEncryptDecrypt.setProvider(new BouncyCastleProvider(), "BC");
     }
 
     @After
@@ -40,7 +49,6 @@ public class EncryptionTest extends InstrumentationTestCase
     {
         testText = null;
     }
-
 
     @Test
     public void testAESEncryptionCBC() throws UnsupportedEncodingException
