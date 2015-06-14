@@ -9,7 +9,7 @@ tried to provide a good and secure example by showcasing:
 * using salt for key derivation
 * streams for arbitrary data sizes
 * unit tests
-* RSA 2048
+* RSA 2048 bit
 * Spongy Castle (Android version of Bouncy Castle encryption library)
 
 The example encrypts the inputted string using AES, encrypts the key via RSA, and does the reverse when
