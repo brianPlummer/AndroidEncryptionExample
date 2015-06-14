@@ -15,3 +15,28 @@ tried to provide a good and secure example by showcasing:
 The example encrypts the inputted string using AES, encrypts the key via RSA, and does the reverse when
 the decrypt button is clicked.
 
+Prerequisite
+========================
+
+In order to build the apk and run tests you must have the JCE (Java Cryptogrpahy Extension) Unlimited Strength policy jars installed for your JRE runtime.  
+
+* JCE download: http://www.oracle.com/technetwork/java/javase/downloads/index.html
+
+If you do not do this then you will see the error:
+```
+java.lang.RuntimeException: java.security.InvalidKeyException: Illegal key size or default parameters
+```
+
+Testing/Building
+========================
+
+To run the unit tests
+```
+./gradlew clean test
+```
+
+To build and install apk:
+```
+./gradlew clean installDebug
+```
+
