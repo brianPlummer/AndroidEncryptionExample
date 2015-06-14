@@ -20,7 +20,7 @@ Prerequisite
 
 In order to build the apk and run tests you must have the JCE (Java Cryptogrpahy Extension) Unlimited Strength policy jars installed for your JRE runtime.  
 
-* JCE download: http://www.oracle.com/technetwork/java/javase/downloads/index.html
+* JCE download for java 8: http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html
 
 If you do not do this then you will see the error:
 ```
