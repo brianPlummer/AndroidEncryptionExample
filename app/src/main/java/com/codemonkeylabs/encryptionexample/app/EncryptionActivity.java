@@ -1,7 +1,9 @@
 package com.codemonkeylabs.encryptionexample.app;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -120,7 +122,7 @@ public class EncryptionActivity extends Activity {
 
             //set up your streams for decryption
             ByteArrayInputStream encInputStream = new ByteArrayInputStream(Base64.decode(encText.toCharArray()));
-            ByteArrayOutputStream plainTextOutputStream = new ByteArrayOutputStream(1024 * 100);
+            ByteArrayOutputStream plainTextOutputStream = new ByteArrayOutputStream(1024 * 10);
             String unencryptedString = "";
 
             //main aes decrypt function
@@ -156,8 +158,7 @@ public class EncryptionActivity extends Activity {
 
     private void encryptButton()
     {
-        String inputtedUnencryptedText = this.inputtedUnencryptedText.getText().toString();
-        ByteArrayInputStream plainTextInputStream;
+        final String inputtedUnencryptedText = this.inputtedUnencryptedText.getText().toString();
 
         //sanity check on input
         if (TextUtils.isEmpty(inputtedUnencryptedText))
@@ -165,6 +166,29 @@ public class EncryptionActivity extends Activity {
             return;
         }
 
+        new AsyncTask<String, Integer, String>(){
+
+            @Override
+            protected String doInBackground(String... params)
+            {
+                return encryptString(inputtedUnencryptedText);
+            }
+
+            @Override
+            protected void onPostExecute(String encryptedString)
+            {
+                super.onPostExecute(encryptedString);
+                if (encryptedString == null) return;
+                encryptedText.setText(encryptedString);
+            }
+        }.execute();
+
+    }
+
+    @Nullable
+    private String encryptString(String inputtedUnencryptedText)
+    {
+        ByteArrayInputStream plainTextInputStream;
         try
         {
             //create an inputstream from a string
@@ -172,10 +196,10 @@ public class EncryptionActivity extends Activity {
         } catch (UnsupportedEncodingException e)
         {
             Log.e(EncryptionActivity.class.getName(), e.getMessage(), e);
-            return;
+            return null;
         }
 
-        ByteArrayOutputStream encOutputStream = new ByteArrayOutputStream(1024 * 100);
+        ByteArrayOutputStream encOutputStream = new ByteArrayOutputStream(1024 * 10);
 
         //main aes encrypt
         byte[] iv = AESEncryptDecrypt.aesEncrypt(plainTextInputStream,
@@ -192,8 +216,7 @@ public class EncryptionActivity extends Activity {
 
         //set ui textview to encrypted base64 encoded value
         String encryptedString = new String(Base64.encode(encOutputStream.toByteArray()));
-        this.encryptedText.setText(encryptedString);
-
+        return encryptedString;
     }
 
 }
