@@ -26,7 +26,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 /**
  * AES Helper Encryption Class
- * Created by brianplummer on 4/29/14.
  */
 public class AESEncryptDecrypt {
 
@@ -64,7 +63,8 @@ public class AESEncryptDecrypt {
     public enum AESCipherType {
         AES_CIPHER_CTR_NOPADDING("AES/CTR/NOPADDING"),
         AES_CIPHER_ECB_PKCS5PADDING("AES/ECB/PKCS5PADDING"),
-        AES_CBC_PKCS5PADDING("AES/CBC/PKCS5Padding");
+        AES_CBC_PKCS5PADDING("AES/CBC/PKCS5Padding"),
+        AES_CBC_PKCS7Padding("AES/CBC/PKCS7Padding");
 
         private final String value;
 
