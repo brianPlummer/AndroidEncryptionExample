@@ -37,6 +37,10 @@ tried to provide a good and secure example by showcasing:
 * RSA 2048 bit
 * Spongy Castle (Android version of Bouncy Castle encryption library)
 
+
+![AndroidEncryptionExample](https://github.com/brianPlummer/AndroidEncryptionExample/raw/master/assets/encryption_sample.gif "AndroidEncryptionExample")
+
+
 Prerequisite
 ========================
 
