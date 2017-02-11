@@ -15,6 +15,27 @@ tried to provide a good and secure example by showcasing:
 The example encrypts the inputted string using AES, encrypts the key via RSA, and does the reverse when
 the decrypt button is clicked.
 
+We start by encrypting the plain text with AES
+
+```java
+byte[] iv = AESEncryptDecrypt.aesEncrypt(plainTextInputStream,
+                "secret key".toCharArray(),
+                "AES/CBC/PKCS5Padding",
+                encOutputStream);
+```
+We then combine the outputted IV and the key we used:
+
+```java
+byte[] combined = Util.concat("secret key".getBytes(), iv);
+```
+
+Lastly we encryt the IV and key using an RSA public key:
+
+```java
+byte[] encryptedAESKeyIV = RSAEncryptDecrypt.encryptRSA(combined, rsaKey.getPublic());
+```
+The encryptedAESKeyIV is sent to the server along with the encrypted text (encOutputStream). The server has the private RSA key, it decrypts the AES key/iv and uses it to decrypt the text. 
+
 Prerequisite
 ========================
 
