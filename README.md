@@ -1,3 +1,5 @@
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-AndroidEncryptionExample-green.svg?style=true)](https://android-arsenal.com/details/3/4886)
+
 Android Encryption Example
 ========================
 
