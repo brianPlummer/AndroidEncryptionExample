@@ -1,6 +1,31 @@
 Android Encryption Example
 ========================
 
+This example encrypts the inputted string using AES, encrypts the key via RSA, and does the reverse when
+the decrypt button is clicked.
+
+We start by encrypting the plain text with AES
+
+```java
+byte[] iv = AESEncryptDecrypt.aesEncrypt(plainTextInputStream,
+                "secret key".toCharArray(),
+                "AES/CBC/PKCS5Padding",
+                encOutputStream);
+```
+We then combine the outputted IV and the key we used:
+
+```java
+byte[] combined = Util.concat("secret key".getBytes(), iv);
+```
+
+Lastly we encryt the IV and key using an RSA public key:
+
+```java
+byte[] encryptedAESKeyIV = RSAEncryptDecrypt.encryptRSA(combined, rsaKey.getPublic());
+```
+
+======================== 
+
 This is an encryption example of RSA and AES (CBC, ECB, CTR) 256 bit key on android with unit tests. I have 
 tried to provide a good and secure example by showcasing:
 
@@ -11,9 +36,6 @@ tried to provide a good and secure example by showcasing:
 * unit tests
 * RSA 2048 bit
 * Spongy Castle (Android version of Bouncy Castle encryption library)
-
-The example encrypts the inputted string using AES, encrypts the key via RSA, and does the reverse when
-the decrypt button is clicked.
 
 Prerequisite
 ========================
