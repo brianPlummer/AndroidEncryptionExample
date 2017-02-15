@@ -11,7 +11,7 @@ We start by encrypting the plain text with AES
 ```java
 byte[] iv = AESEncryptDecrypt.aesEncrypt(plainTextInputStream,
                 "secret key".toCharArray(),
-                "AES/CBC/PKCS5Padding",
+                "AES/ECB/PKCS5PADDING",
                 encOutputStream);
 ```
 We then combine the outputted IV and the key we used:
